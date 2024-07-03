@@ -1,0 +1,30 @@
+name: Autograding Tests
+'on':
+- workflow_dispatch
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Test average program output
+      id: test-average-program-output
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Test average program output
+        setup-command: ''
+        command: gradle test
+        timeout: 2
+        max-score: 5
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TEST-AVERAGE-PROGRAM-OUTPUT_RESULTS: "${{steps.test-average-program-output.outputs.result}}"
+      with:
+        runners: test-average-program-output
